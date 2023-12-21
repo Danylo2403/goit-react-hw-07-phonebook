@@ -1,33 +1,32 @@
 import { Formik } from 'formik';
 import { Form, Field, Button, ErrorMessage } from './ContactForm.styled';
-import { nanoid } from 'nanoid';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from '../../redux/contactsSlice';
-
-
+import { addContact } from '../../redux/operations';
+import { getContacts } from '../../redux/selectors';
+//redux/selectors
 const contactsFormSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, 'Too Short!')
     .max(50, 'Too Long!')
     .required('Required field'),
-  number: Yup.string()
+  phone: Yup.string()
     .matches(
-      /^[0-9]{3}-[0-9]{2}-[0-9]{2}$/,
-      'Please, enter only digits in format of "123-12-12"'
+      /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
+      'Please, enter only digits in format of "123-123-1234"'
     )
     .required('Required field'),
 });
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts);
+  const contacts = useSelector(getContacts);
 
   return (
     <Formik
       initialValues={{
         name: '',
-        number: '',
+        phone: '',
       }}
       validationSchema={contactsFormSchema}
       onSubmit={(values, actions) => {
@@ -42,8 +41,7 @@ export const ContactForm = () => {
         dispatch(
           addContact({
             name: values.name,
-            number: values.number,
-            id: nanoid(),
+            phone: values.phone,
           })
         );
 
@@ -55,9 +53,9 @@ export const ContactForm = () => {
         <Field id="name" name="name" />
         <ErrorMessage name="name" component={'span'}></ErrorMessage>
 
-        <label htmlFor="number">Number</label>
-        <Field id="number" name="number" type="tel" />
-        <ErrorMessage name="number" component={'span'}></ErrorMessage>
+        <label htmlFor="phone">Number</label>
+        <Field id="phone" name="phone" type="tel" />
+        <ErrorMessage name="phone" component={'span'}></ErrorMessage>
 
         <Button type="submit">Add contact</Button>
       </Form>
